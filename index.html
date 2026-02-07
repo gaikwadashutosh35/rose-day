@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Rose Day 🌹</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+      :root {
+        --color-bg: #fff5f5;
+        --color-primary: #d42d2d; /* Rose Red */
+        --color-secondary: #2d5a27; /* Stem Green */
+        --color-text: #333;
+        --font-head: "Pacifico", cursive;
+        --font-body: "Poppins", sans-serif;
+        --shadow-soft: 0 10px 30px -5px rgba(212, 45, 45, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+        font-family: var(--font-body);
+        color: var(--color-text);
+        overflow: hidden; /* Prevent scrolling during transitions */
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /* --- PROGRESS BAR --- */
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 6px;
+        background: var(--color-primary);
+        width: 0%;
+        z-index: 100;
+        transition: width 0.5s ease;
+      }
+
+      /* --- PAGE STRUCTURE --- */
+      .page-section {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        padding: 40px 20px;
+        display: none;
+        opacity: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .page-active {
+        display: flex;
+        opacity: 1;
+        z-index: 10;
+      }
+
+      h1 {
+        font-family: var(--font-head);
+        font-size: 3.5rem;
+        color: var(--color-primary);
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        background: var(--color-primary);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: var(--shadow-soft);
+        margin-top: 20px;
+        transition: 0.3s;
+      }
+      .btn:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.1);
+      }
+
+      /* --- ROSE IMAGES --- */
+      .rose-hero {
+        width: 250px;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 8px solid white;
+        box-shadow: var(--shadow-soft);
+        margin-bottom: 20px;
+      }
+
+      .rose-card {
+        background: white;
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        max-width: 300px;
+      }
+
+      .rose-card img {
+        width: 100%;
+        border-radius: 10px;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      /* --- PETAL ANIMATION --- */
+      .petal {
+        position: fixed;
+        pointer-events: none;
+        z-index: 1;
+        font-size: 1.5rem;
+      }
+
+      .music-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        z-index: 1000;
+      }
+      /* Container for the infinite roses */
+      #rose-garden {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none; /* Allows clicking buttons through the roses */
+        z-index: 5; /* Sit behind the content but above the background */
+        overflow: hidden;
+      }
+
+      .falling-rose {
+        position: absolute;
+        width: 40px; /* Size of the falling roses */
+        height: auto;
+        user-select: none;
+        filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.1));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="progress-bar" id="progress-bar"></div>
+    <div id="petal-container"></div>
+
+    <audio id="bg-music" loop>
+      <source
+        src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3"
+        type="audio/mp3"
+      />
+    </audio>
+    <div class="music-toggle" id="music-btn">🔇</div>
+
+    <section id="page-1" class="page-section page-active">
+      <img
+        src="https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dXVmZ3Uybnl1ZmxodGU2c2lqOXF1bmZ2M280OHY5OWxuZGJocWZzdSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/rSOMJPt2w64Y1BrjeQ/giphy.gif"
+        alt="Cartoon giving rose"
+        class="rose-hero"
+      />
+      <h1>Happy Rose Day!</h1>
+      <p>Every rose has a story, but ours is my favorite.</p>
+      <button class="btn" onclick="nextPage(2)">Accept my Rose 🌹</button>
+    </section>
+
+    <section id="page-2" class="page-section">
+      <div class="rose-card">
+        <img
+          src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2Z0b2g1YnN1azQ2dHF1amhxY3Y4bHQ1YmhicWI1d2o1c2g5NjB1cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xd7EHNVClXWg35nn0q/giphy.gif"
+          alt="Bouquet"
+        />
+        <h3 style="margin-top: 15px; color: var(--color-primary)">
+          To a Special Soul
+        </h3>
+        <p style="font-size: 0.9rem; padding: 10px">
+          Like a rose, your presence adds color and fragrance to my life every
+          single day.
+        </p>
+      </div>
+      <button class="btn" onclick="nextPage(3)">One More Thing...</button>
+    </section>
+
+    <section id="page-3" class="page-section">
+      <h1 style="font-size: 2.5rem">Will you let our love bloom this year?</h1>
+      <div style="margin-top: 30px">
+        <button
+          class="btn"
+          id="yes-btn"
+          style="background: var(--color-secondary); margin-right: 10px"
+        >
+          Yes, Always! 🌹
+        </button>
+        <button class="btn" id="no-btn" style="background: #999">No 🥀</button>
+      </div>
+    </section>
+
+    <script>
+      let currentPage = 1;
+      const totalPages = 3;
+      const bgMusic = document.getElementById("bg-music");
+
+      // 1. INFINITE FALLING ROSES LOGIC
+      function createInfiniteRoses() {
+        let container = document.getElementById("rose-garden");
+        if (!container) {
+          container = document.createElement("div");
+          container.id = "rose-garden";
+          // CSS to ensure roses are visible but don't block buttons
+          Object.assign(container.style, {
+            position: "fixed",
+            top: "0",
+            left: "0",
+            width: "100vw",
+            height: "100vh",
+            pointerEvents: "none",
+            zIndex: "2", // Above background, below text
+            overflow: "hidden",
+          });
+          document.body.appendChild(container);
+        }
+
+        const roseImages = [
+          "https://pngimg.com/d/rose_PNG639.png", // Re
+          "https://pngimg.com/d/rose_PNG651.png", // Yellow
+          "https://pngimg.com/d/rose_PNG66838.png", // White
+          "https://pngimg.com/d/rose_PNG66982.png",
+          "https://pngimg.com/d/rose_PNG66842.png",
+          "https://pngimg.com/d/rose_PNG66873.png",
+          "https://pngimg.com/d/rose_PNG66815.png",
+          "https://pngimg.com/d/rose_PNG66749.png",
+          "https://pngimg.com/d/white_roses_PNG2778.png",
+          "https://pngimg.com/d/white_roses_PNG2782.png",
+        ];
+
+        const totalRoses = 25;
+
+        for (let i = 0; i < totalRoses; i++) {
+          const rose = document.createElement("img");
+          rose.src = roseImages[Math.floor(Math.random() * roseImages.length)];
+          rose.style.position = "absolute";
+          rose.style.width = Math.random() * 20 + 40 + "px"; // 20px to 60px
+
+          container.appendChild(rose);
+
+          // Start them at random heights initially so the screen is full immediately
+          gsap.set(rose, {
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            opacity: Math.random() * 0.6 + 0.4,
+            rotation: Math.random() * 360,
+          });
+
+          // Kick off the infinite loop
+          startRoseAnimation(rose);
+        }
+      }
+
+      function startRoseAnimation(rose) {
+        const duration = Math.random() * 8 + 6;
+        const sway = Math.random() * 200 - 100;
+
+        // Move to bottom
+        gsap.to(rose, {
+          y: window.innerHeight + 100,
+          x: `+=${sway}`,
+          rotation: "+=360",
+          duration: duration,
+          ease: "none",
+          onComplete: () => {
+            // RESET to top
+            gsap.set(rose, {
+              y: -100,
+              x: Math.random() * window.innerWidth,
+              rotation: Math.random() * 360,
+            });
+            // RESTART animation
+            startRoseAnimation(rose);
+          },
+        });
+      }
+
+      // 2. NAVIGATION LOGIC
+      function nextPage(num) {
+        const progress = ((num - 1) / (totalPages - 1)) * 100;
+        const bar = document.getElementById("progress-bar");
+        if (bar) bar.style.width = progress + "%";
+
+        gsap.to(`#page-${currentPage}`, {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.5,
+          onComplete: () => {
+            document
+              .getElementById(`page-${currentPage}`)
+              .classList.remove("page-active");
+            currentPage = num;
+            const nextEl = document.getElementById(`page-${currentPage}`);
+            nextEl.classList.add("page-active");
+            gsap.fromTo(
+              nextEl,
+              { opacity: 0, scale: 1.1 },
+              { opacity: 1, scale: 1, duration: 0.5 },
+            );
+          },
+        });
+        confetti({ particleCount: 40, colors: ["#d42d2d", "#ffffff"] });
+      }
+
+      // 3. INTERACTION LOGIC
+      document.getElementById("music-btn").onclick = () => {
+        if (bgMusic.paused) {
+          bgMusic.play().catch(() => {
+            console.log("Music blocked by browser");
+          });
+          document.getElementById("music-btn").innerText = "🌹";
+        } else {
+          bgMusic.pause();
+          document.getElementById("music-btn").innerText = "🔇";
+        }
+      };
+
+      const noBtn = document.getElementById("no-btn");
+      if (noBtn) {
+        noBtn.addEventListener("mouseenter", () => {
+          gsap.to(noBtn, {
+            x: Math.random() * 300 - 150,
+            y: Math.random() * 300 - 150,
+            duration: 0.2,
+          });
+        });
+      }
+
+      document.getElementById("yes-btn").onclick = () => {
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        document.querySelector("#page-3 h1").innerText =
+          "You've made me the happiest! Happy Rose Day! ❤️";
+        document.getElementById("yes-btn").style.display = "none";
+        document.getElementById("no-btn").style.display = "none";
+      };
+
+      // Initialize
+      window.addEventListener("DOMContentLoaded", createInfiniteRoses);
+    </script>
+  </body>
+</html>
